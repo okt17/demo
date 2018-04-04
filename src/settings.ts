@@ -1,0 +1,16 @@
+interface Settings {
+  DEFAULT_MAP_PROJECTION: ol.ProjectionLike;
+  DEFAULT_MAP_CENTER: [number, number];
+  DEFAULT_MAP_ZOOM: number;
+  MAP_ANIMATION_DURATION: number;
+}
+
+const SETTINGS: Settings = {
+  DEFAULT_MAP_PROJECTION: 'EPSG:3857',
+  // DEFAULT_MAP_CENTER: [4189555, 7509172], // Moscow
+  DEFAULT_MAP_CENTER: [4419742, 5979691], // Rostov
+  DEFAULT_MAP_ZOOM: 9,
+  MAP_ANIMATION_DURATION: 400,
+};
+
+export default SETTINGS;

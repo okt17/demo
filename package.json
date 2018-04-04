@@ -1,0 +1,31 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --watch"
+  },
+  "author": "okt17",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/openlayers": "^4.3.15",
+    "@types/react": "^16.0.36",
+    "@types/react-dom": "^16.0.3",
+    "awesome-typescript-loader": "^3.4.1",
+    "css-loader": "^0.28.11",
+    "source-map-loader": "^0.2.3",
+    "style-loader": "^0.20.3",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1",
+    "webpack": "^3.11.0"
+  },
+  "dependencies": {
+    "openlayers": "^4.6.4",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  }
+}
