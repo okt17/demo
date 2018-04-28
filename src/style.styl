@@ -20,7 +20,15 @@ $theme = {
   }
 }
 
+.modal-container {
+  position: relative;
+}
+.modal-container .modal, .modal-container .modal-backdrop {
+  position: absolute;
+}
+
 @import './*/**';
+@import './bootstrap.css';
 
 html, body, #app-root {
   height: 100%;

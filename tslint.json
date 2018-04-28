@@ -16,6 +16,10 @@
             "avoid-escape",
             "avoid-template"
         ],
+        "no-trailing-whitespace": {
+            "options": true,
+            "severity": "warning"
+        },
     },
     "rulesDirectory": []
 }

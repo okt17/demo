@@ -1,0 +1,14 @@
+import 'core-js/fn/object/values';
+import 'core-js/fn/object/entries';
+import 'core-js/fn/array/includes';
+import 'core-js/es6/object';
+import 'core-js/es6/array';
+import 'core-js/es6/function';
+import 'core-js/es6/string';
+import 'core-js/es6/promise';
+import 'core-js/es6/map';
+import 'core-js/es6/set';
+import 'tslib';
+import 'openlayers';
+import 'react';
+import 'react-dom';

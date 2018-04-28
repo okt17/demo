@@ -1,29 +1,38 @@
 import * as React from 'react';
-import Button from '../../../ui/Button';
+import ConfirmButton from '../../../ui/ConfirmButton';
 
-interface Props {
+interface IProps {
   layer: ol.layer.Base;
   map: ol.Map;
 }
 
-export default class LayersListItem extends React.Component<Props> {
+export default class LayersListItem extends React.Component<IProps> {
   removeLayer = (): void => {
     this.props.map.removeLayer(this.props.layer);
   };
   render() {
-    const {
-      props: {
-        layer,
-      },
-    } = this;
+    const
+      {
+        props: {
+          layer,
+        },
+      } = this,
+      name = layer.get( 'name' );
 
     return <div className='layers-list__item'>
-      {layer.get('name')}
-      <Button
-        onClick={this.removeLayer}
-      >
-        Remove
-      </Button>
+      <div className='layers-list__item__name'>
+        {name}
+      </div>
+      {
+        layer.get( 'removable' ) !== false
+        &&
+        <ConfirmButton
+          onClick={this.removeLayer}
+          modalText={`Are you sure you want to remove ${name}?`}
+        >
+          Remove
+        </ConfirmButton>
+      }
     </div>;
   }
 }

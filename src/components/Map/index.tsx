@@ -1,54 +1,70 @@
 import * as React from 'react';
 import * as ol from 'openlayers';
-import OlMap from '../../EnhancedOlMap';
+import EnhancedOlMap from '../../EnhancedOlMap';
 import SETTINGS from '../../settings';
+import LAYERS from '../../data/layers';
+import { getOlLayer } from '../../utils/layers';
 
-interface Props {
+interface IProps {
   olMapRef? ( olMap: ol.Map ): void;
 }
 
-export default class Map extends React.Component<Props> {
+export default class Map extends React.Component<IProps> {
   protected mapRootElement: HTMLElement;
-  protected map: ol.Map;
   protected handleRef = ( instance: HTMLElement ): void => {
     this.mapRootElement = instance;
   };
   componentDidMount() {
-    const baseLayer = new ol.layer.Tile( {
-      source: new ol.source.XYZ( {
-        url: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga',
-      } ),
-      zIndex: 0,
+    // initialize a view for the map based on default settings from settings.ts
+    const view = new ol.View( {
+      projection: SETTINGS.DEFAULT_MAP_PROJECTION,
+      center: SETTINGS.DEFAULT_MAP_CENTER,
+      zoom: SETTINGS.DEFAULT_MAP_ZOOM,
     } );
-    baseLayer.set( 'name', 'Google Maps' );
 
-    this.map = new OlMap( {
+    // get all layers from data/layers
+    const layers = LAYERS.slice(1).map( getOlLayer );
+    const vectorLayer = layers.find( ( layer: ol.layer.Base ) => (
+      layer instanceof ol.layer.Vector
+    ) ) as ol.layer.Vector;
+
+    // initialize map controls
+    const controls = ol.control.defaults().extend( [
+      new ol.control.ZoomSlider(),
+      new ol.control.MousePosition(),
+      new ol.control.OverviewMap( {
+        collapsed: false,
+      } ),
+    ] );
+
+    // initialize the map
+    const map = new EnhancedOlMap( {
       target: this.mapRootElement,
-      view: new ol.View( {
-        projection: SETTINGS.DEFAULT_MAP_PROJECTION,
-        center: SETTINGS.DEFAULT_MAP_CENTER,
-        zoom: SETTINGS.DEFAULT_MAP_ZOOM,
-      } ),
-      layers: [
-        baseLayer,
-      ],
-      controls: ol.control.defaults().extend( [
-        new ol.control.ZoomSlider(),
-        new ol.control.MousePosition(),
-        new ol.control.OverviewMap( {
-          collapsed: false,
-        } ),
-      ] ),
+      view,
+      layers,
+      controls,
     } );
 
-    if( typeof this.props.olMapRef === 'function' ) {
-      this.props.olMapRef( this.map );
+    // if ( vectorLayer !== undefined ) {
+    //   // if there is a vector layer present,
+    //   // add an interaction for it
+    //   const interaction = new ol.interaction.Modify( {
+    //     source: vectorLayer.getSource(),
+    //   } );
+
+    //   map.addInteraction( interaction );
+    // }
+
+    if ( typeof this.props.olMapRef === 'function' ) {
+      // passing the map object to upper component's state
+      // for use in other parts of the app
+      this.props.olMapRef( map );
     }
 
     // dev only - console access
     Object.defineProperty( window, 'mapDev', {
       value: {
-        map: this.map,
+        map,
         ol,
       },
     } );

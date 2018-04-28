@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Item from './Item';
 
-interface Props {
+interface IProps {
   map: ol.Map;
 }
 
-export default class LayersList extends React.Component<Props> {
-  constructor( props: Props ) {
+export default class LayersList extends React.Component<IProps> {
+  constructor( props: IProps ) {
     super( props );
 
     this.props.map.getLayers().on( ['add', 'remove'], () => this.forceUpdate() );
