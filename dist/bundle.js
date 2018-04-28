@@ -14558,9 +14558,13 @@ var App = /** @class */ (function (_super) {
     function App() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.state = {};
-        // we're using lambda properties instead of class methods
-        // in order to preserve context
-        // the other way is to .bind( this ) every method in the constructor
+        /*
+          we're using lambda properties instead of class methods
+          in order to preserve context
+          the other way around is to .bind( this ) every method in the constructor
+          the downside of this is that unlike traditional methods,
+          lambda property won't be present on the prototype
+        */
         _this.handleMapRef = function (olMap) { return _this.setState({
             map: olMap
         }); };
@@ -27209,7 +27213,7 @@ var LayersListItem = /** @class */ (function (_super) {
             React.createElement("input", { title: 'Opacity', type: 'range', min: 0, max: 1.0, step: 0.05, className: 'layers-list__item__opacity-input', onChange: this.handleOpacityChange, value: layer.getOpacity() }),
             layer.get('removable') !== false
                 &&
-                    React.createElement(ConfirmButton_1.default, { onClick: this.removeLayer, modalText: "Are you sure you want to remove " + name + " layer?" }, "Remove"));
+                    React.createElement(ConfirmButton_1.default, { title: 'Delete this layer from the map', bsStyle: 'danger', onClick: this.removeLayer, modalText: "Are you sure you want to remove " + name + " layer?" }, "Remove"));
     };
     return LayersListItem;
 }(React.Component));
@@ -27262,7 +27266,9 @@ var ConfirmButton = /** @class */ (function (_super) {
         };
         // we're using lambda properties instead of class methods
         // in order to preserve context
-        // the other way is to .bind( this ) every method in the constructor
+        // the other way around is to .bind( this ) every method in the constructor
+        // the downside of this is that unlike traditional methods,
+        // lambda property won't be present on the prototype
         _this.openConfirmModal = function () { return _this.setState({
             confirmModalVisible: true,
         }); };
@@ -27387,8 +27393,8 @@ var Item = /** @class */ (function (_super) {
             React.createElement(react_bootstrap_1.Button, { className: 'data-layers__item__button', bsStyle: disabled
                     ? undefined
                     : 'primary', onClick: this.handleButtonClick, title: disabled
-                    ? 'Unable to add this layer'
-                    : 'Add this layer to map', disabled: disabled }, disabled
+                    ? 'Unable to add this layer: already present'
+                    : 'Add this layer to the map', disabled: disabled }, disabled
                 ? 'Already present'
                 : 'Add to map'));
     };
@@ -27432,12 +27438,10 @@ var MapPlaces = /** @class */ (function (_super) {
     function MapPlaces() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.state = __assign({}, (function () {
-            var view = _this.props.map.getView();
-            var center = view.getCenter();
-            center = ol.proj.transform(center, view.getProjection(), _this.props.projection);
+            var view = _this.props.map.getView(), center = ol.proj.transform(view.getCenter(), view.getProjection(), _this.props.projection);
             return {
-                xValue: String(center[0].toFixed(5)),
-                yValue: String(center[1].toFixed(5)),
+                xValue: center[0].toFixed(5),
+                yValue: center[1].toFixed(5),
             };
         })());
         _this.handleInputChange = function (_a) {
@@ -27459,11 +27463,16 @@ var MapPlaces = /** @class */ (function (_super) {
                 _a = preset.coordinates, x = _a[0], y = _a[1];
                 projection = 'EPSG:4326';
             }
-            var view = _this.props.map.getView(), center = ol.proj.transform([x, y], projection, view.getProjection());
+            var view = _this.props.map.getView(), center = ol.proj.transform([x, y], projection, view.getProjection()), duration = settings_1.default.MAP_ANIMATION_DURATION * 2;
             view.animate({
-                zoom: 10,
+                zoom: 3,
+                duration: duration,
+            }, {
                 center: center,
-                duration: settings_1.default.MAP_ANIMATION_DURATION,
+                duration: duration,
+            }, {
+                zoom: 10,
+                duration: duration,
             });
             if (typeof _this.props.onAnimate === 'function') {
                 _this.props.onAnimate();
@@ -27481,10 +27490,11 @@ var MapPlaces = /** @class */ (function (_super) {
         }
         return React.createElement("div", { className: 'map-places' },
             MapPlaces.Presets.map(function (preset) { return React.createElement(PresetItem_1.default, { key: preset.name, preset: preset, onButtonClick: _this.goToCoordinates }); }),
-            React.createElement("h6", null,
-                " Enter you coordinates in ",
-                projection,
-                ": "),
+            React.createElement("h5", null,
+                React.createElement("b", null,
+                    " Enter you coordinates in ",
+                    projection,
+                    ": ")),
             React.createElement("div", { className: 'map-places__preset-item' },
                 React.createElement("div", { className: 'map-places__preset-item__name' },
                     React.createElement("input", { placeholder: 'Enter coordinates', type: 'number', name: 'xValue', onChange: this.handleInputChange, value: xValue }),
@@ -27507,6 +27517,22 @@ var MapPlaces = /** @class */ (function (_super) {
         {
             name: 'Moscow',
             coordinates: [37.606154, 55.7511],
+        },
+        {
+            name: 'Rio de Janeiro',
+            coordinates: [-43.19519, -22.88838],
+        },
+        // {
+        //   name: 'Rostov-on-Don',
+        //   coordinates: [39.70193, 47.24855],
+        // },
+        {
+            name: 'Tokyo',
+            coordinates: [139.571, 35.6186],
+        },
+        {
+            name: 'Sydney',
+            coordinates: [151.19735, -33.8606],
         },
     ];
     return MapPlaces;
@@ -27610,7 +27636,7 @@ exports = module.exports = __webpack_require__(218)(false);
 exports.i(__webpack_require__(487), "");
 
 // module
-exports.push([module.i, ".modal-container {\n  position: relative;\n}\n.modal-container .modal,\n.modal-container .modal-backdrop {\n  position: absolute;\n}\n.app {\n  position: relative;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n}\n.data-layers__item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.data-layers__item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.data-layers__item__type {\n  padding: 0.25rem 0.5rem;\n  font-weight: bold;\n}\n.data-layers__item__button {\n  width: 30%;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.layers-list__item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.layers-list__item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.layers-list__item__checkbox {\n  margin: 0.5rem 0;\n}\n.layers-list__item__opacity-input {\n  width: 20%;\n  margin: 0 0.25rem;\n}\n.ol-map-root {\n  width: 100%;\n  height: 100%;\n  margin: 0;\n}\n.map-menu {\n  display: flex;\n  position: absolute;\n  top: 0;\n  left: 50%;\n  transform: translate(-50%);\n  opacity: 0.8;\n}\n.map-menu .btn:first-child {\n  border-bottom-left-radius: 20px;\n}\n.map-menu .btn:last-child {\n  border-bottom-right-radius: 20px;\n}\n.map-places__preset-item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.map-places__preset-item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.map-places__custom {\n  padding: 0.125rem;\n}\n.map-places__custom__button {\n  float: right;\n}\nhtml,\nbody,\n#app-root {\n  height: 100%;\n  margin: 0;\n  font-family: Arial, sans-serif;\n}\n.hidden {\n  display: none;\n}\n", ""]);
+exports.push([module.i, ".modal-container {\n  position: relative;\n}\n.modal-container .modal,\n.modal-container .modal-backdrop {\n  position: absolute;\n}\n.app {\n  position: relative;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n}\n.data-layers__item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.data-layers__item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.data-layers__item__type {\n  padding: 0.25rem 0.5rem;\n  font-weight: bold;\n}\n.data-layers__item__button {\n  width: 30%;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.layers-list__item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.layers-list__item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.layers-list__item__checkbox {\n  margin: 0.5rem 0;\n}\n.layers-list__item__opacity-input {\n  width: 20%;\n  margin: 0 0.5rem;\n}\n.ol-map-root {\n  width: 100%;\n  height: 100%;\n  margin: 0;\n}\n.map-menu {\n  display: flex;\n  position: absolute;\n  top: 0;\n  left: 50%;\n  transform: translate(-50%);\n  opacity: 0.8;\n}\n.map-menu .btn:first-child {\n  border-bottom-left-radius: 20px;\n}\n.map-menu .btn:last-child {\n  border-bottom-right-radius: 20px;\n}\n.map-places__preset-item {\n  display: flex;\n  padding: 0.125rem;\n  user-select: none;\n}\n.map-places__preset-item__name {\n  padding: 0.25rem;\n  flex: 1;\n}\n.map-places__custom {\n  padding: 0.125rem;\n}\n.map-places__custom__button {\n  float: right;\n}\nhtml,\nbody,\n#app-root {\n  height: 100%;\n  margin: 0;\n  font-family: Arial, sans-serif;\n}\n.hidden {\n  display: none;\n}\n", ""]);
 
 // exports
 

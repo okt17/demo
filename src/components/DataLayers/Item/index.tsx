@@ -41,8 +41,8 @@ class Item extends React.PureComponent<IProps> {
         onClick={this.handleButtonClick}
         title={
           disabled
-            ? 'Unable to add this layer'
-            : 'Add this layer to map'
+            ? 'Unable to add this layer: already present'
+            : 'Add this layer to the map'
         }
         disabled={disabled}
       >

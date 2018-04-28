@@ -19,7 +19,9 @@ class ConfirmButton extends React.PureComponent<IProps, IState> {
   };
   // we're using lambda properties instead of class methods
   // in order to preserve context
-  // the other way is to .bind( this ) every method in the constructor
+  // the other way around is to .bind( this ) every method in the constructor
+  // the downside of this is that unlike traditional methods,
+  // lambda property won't be present on the prototype
   openConfirmModal = () => this.setState( {
     confirmModalVisible: true,
   } );

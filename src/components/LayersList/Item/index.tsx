@@ -65,6 +65,8 @@ export default class LayersListItem extends React.Component<IProps> {
         layer.get( 'removable' ) !== false
         &&
         <ConfirmButton
+          title='Delete this layer from the map'
+          bsStyle='danger'
           onClick={this.removeLayer}
           modalText={`Are you sure you want to remove ${name} layer?`}
         >

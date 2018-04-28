@@ -21,18 +21,17 @@ class MapPlaces extends React.PureComponent<IProps, IState> {
     // initialize input coordinates with current map view center's coordinates
     // presented in this.props.projection's coordinate system
     ...( () => {
-      const view = this.props.map.getView();
-      let center = view.getCenter();
-
-      center = ol.proj.transform(
-        center,
-        view.getProjection(),
-        this.props.projection
-      );
+      const
+        view = this.props.map.getView(),
+        center = ol.proj.transform(
+          view.getCenter(),
+          view.getProjection(),
+          this.props.projection
+        );
 
       return {
-        xValue: String( center[0].toFixed( 5 ) ),
-        yValue: String( center[1].toFixed( 5 ) ),
+        xValue: center[0].toFixed( 5 ),
+        yValue: center[1].toFixed( 5 ),
       };
     } )(),
   };
@@ -51,6 +50,22 @@ class MapPlaces extends React.PureComponent<IProps, IState> {
     {
       name: 'Moscow',
       coordinates: [37.606154, 55.7511],
+    },
+    {
+      name: 'Rio de Janeiro',
+      coordinates: [-43.19519, -22.88838],
+    },
+    // {
+    //   name: 'Rostov-on-Don',
+    //   coordinates: [39.70193, 47.24855],
+    // },
+    {
+      name: 'Tokyo',
+      coordinates: [139.571, 35.6186],
+    },
+    {
+      name: 'Sydney',
+      coordinates: [151.19735, -33.8606],
     },
   ];
   protected handleInputChange = ( {
@@ -84,13 +99,23 @@ class MapPlaces extends React.PureComponent<IProps, IState> {
         [x, y],
         projection,
         view.getProjection(),
-      );
+      ),
+      duration = SETTINGS.MAP_ANIMATION_DURATION * 2;
 
-    view.animate( {
-      zoom: 10,
-      center,
-      duration: SETTINGS.MAP_ANIMATION_DURATION,
-    } );
+    view.animate(
+      {
+        zoom: 3,
+        duration,
+      },
+      {
+        center,
+        duration,
+      },
+      {
+        zoom: 10,
+        duration,
+      },
+    );
 
     if ( typeof this.props.onAnimate === 'function' ) {
       this.props.onAnimate();
@@ -117,7 +142,7 @@ class MapPlaces extends React.PureComponent<IProps, IState> {
         /> )
       }
 
-      <h6> Enter you coordinates in {projection}: </h6>
+      <h5><b> Enter you coordinates in {projection}: </b></h5>
       <div className='map-places__preset-item'>
         <div className='map-places__preset-item__name'>
           <input
