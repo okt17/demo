@@ -23,7 +23,7 @@ export default class Map extends React.Component<IProps> {
     } );
 
     // get all layers from data/layers
-    const layers = LAYERS.slice(1).map( getOlLayer );
+    const layers = LAYERS.slice(0, 2).map( getOlLayer );
     const vectorLayer = layers.find( ( layer: ol.layer.Base ) => (
       layer instanceof ol.layer.Vector
     ) ) as ol.layer.Vector;
@@ -31,7 +31,10 @@ export default class Map extends React.Component<IProps> {
     // initialize map controls
     const controls = ol.control.defaults().extend( [
       new ol.control.ZoomSlider(),
-      new ol.control.MousePosition(),
+      new ol.control.MousePosition( {
+        projection: 'EPSG:4326',
+        coordinateFormat: ol.coordinate.toStringHDMS,
+      } ),
       new ol.control.OverviewMap( {
         collapsed: false,
       } ),
@@ -45,15 +48,42 @@ export default class Map extends React.Component<IProps> {
       controls,
     } );
 
-    // if ( vectorLayer !== undefined ) {
-    //   // if there is a vector layer present,
-    //   // add an interaction for it
-    //   const interaction = new ol.interaction.Modify( {
-    //     source: vectorLayer.getSource(),
-    //   } );
+    if ( vectorLayer !== undefined ) {
+      // if there is a vector layer present,
+      // add an interaction for it
+      const interaction = new ol.interaction.Modify( {
+        source: vectorLayer.getSource(),
+      } );
 
-    //   map.addInteraction( interaction );
-    // }
+      map.addInteraction( interaction );
+
+      // disable interaction on chaning layer visibility to false
+      // and the other way around
+      const changeEventListenerKey = vectorLayer.on( 'change:visible', () => {
+        if (
+          vectorLayer.getVisible()
+          &&
+          interaction.getActive() == false
+        ) {
+          interaction.setActive( true );
+        }
+        else if ( interaction.getActive() ) {
+          interaction.setActive( false );
+        }
+      } );
+
+      // remove this interaction if the vector layer is removed from the map
+      const removeEventListenerKey = map.getLayers().on(
+        'remove',
+        ( event: any ) => {
+          if ( event.element === vectorLayer ) {
+            map.removeInteraction( interaction );
+            ol.Observable.unByKey( removeEventListenerKey );
+            ol.Observable.unByKey( changeEventListenerKey );
+          }
+        },
+      );
+    }
 
     if ( typeof this.props.olMapRef === 'function' ) {
       // passing the map object to upper component's state

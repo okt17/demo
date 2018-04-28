@@ -15,12 +15,12 @@ function layerExists ( layers: ol.layer.Base[], layer: ILayer ) {
 }
 
 class DataLayers extends React.PureComponent<IProps> {
-  changeListenerKey: ol.EventsKey = this.props.map.getLayers().on(
+  private listenerKey: ol.EventsKey = this.props.map.getLayers().on(
     ['add', 'remove'],
     () => this.forceUpdate(),
   );
   componentWillUnmount () {
-    ol.Observable.unByKey( this.changeListenerKey );
+    ol.Observable.unByKey( this.listenerKey );
   }
   handleItemClick = ( layer: ILayer ) => {
     const olLayer = getOlLayer( layer );
@@ -35,6 +35,7 @@ class DataLayers extends React.PureComponent<IProps> {
         LAYERS.map( ( layer: ILayer ) => <Item
           key={layer.name}
           layer={layer}
+          // make it unable to add existing layers
           disabled={layerExists( mapLayers, layer )}
           onClick={this.handleItemClick}
         /> )

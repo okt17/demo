@@ -3,6 +3,7 @@ import { Button, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
 import Modal from '../../ui/Modal';
 import LayersList from '../LayersList';
 import DataLayers from '../DataLayers';
+import MapPlaces from '../MapPlaces';
 
 interface IProps {
   map: ol.Map;
@@ -12,6 +13,7 @@ interface IState {
   activeElementName?: string;
 }
 
+// presents a set of buttons allowing the user to choose between menu entries
 export default class MapMenu extends React.PureComponent<IProps, IState> {
   state: IState = {};
   static Items: {
@@ -19,9 +21,13 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
   } = {
     layers: 'Manage Layers',
     dataLayers: 'Add Layers',
-    placeholder: 'Placeholder',
+    places: 'Places',
+    about: 'About',
   };
-  handleButtonClick = ( {
+  clearActiveElement = () => this.setState( {
+    activeElementName: undefined,
+  } );
+  protected handleButtonClick = ( {
     target: {
       name,
     },
@@ -67,7 +73,7 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
           title={MapMenu.Items[activeElementName]}
           footerContent={
             <Button
-              onClick={() => this.setState( { activeElementName: undefined } )}
+              onClick={this.clearActiveElement}
             >
               Close
             </Button>
@@ -82,6 +88,27 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
             activeElementName === 'dataLayers'
             &&
             <DataLayers map={map}/>
+          }
+          {
+            activeElementName === 'places'
+            &&
+            <MapPlaces
+              map={map}
+              onAnimate={this.clearActiveElement}
+            />
+          }
+          {
+            activeElementName === 'about'
+            &&
+            <p>
+              Powered by <a
+                href='http://openlayers.org/'
+                target='_blank'
+              >Openlayers</a> and <a
+                href='https://react-bootstrap.github.io/'
+                target='_blank'
+              >React-Bootstrap</a>.
+            </p>
           }
         </Modal>
       }

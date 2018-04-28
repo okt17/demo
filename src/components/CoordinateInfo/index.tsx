@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as ol from 'openlayers';
 import { ajax } from 'jquery';
-import { UV_UDP_REUSEADDR } from 'constants';
 
 interface IProps {
   map: ol.Map;
@@ -24,9 +23,13 @@ class CoordinateInfo extends React.PureComponent<IProps, IState> {
       this.request.abort();
     }
 
-    const [x, y] = [0, 0]; //todo: get coordinates from event
+    const coord = ol.proj.transform(
+      event.coordinate,
+      event.map.getView().getProjection(),
+      'EPSG:4326',
+    );
 
-    this.request = ajax( getUrl( [x, y] ) )
+    this.request = ajax( getUrl( coord ) )
       .done( ( result: any ) => this.setState( { data: result } ) )
       .fail( () => this.setState( { data: undefined } ) );
   };

@@ -9,7 +9,8 @@ interface IProps {
 }
 
 class Item extends React.PureComponent<IProps> {
-  handleClick = () => {
+  protected handleButtonClick = () => {
+    // only call onclick handler if 'disabled' is not true
     this.props.disabled !== true
     &&
     this.props.onClick( this.props.layer )
@@ -24,17 +25,32 @@ class Item extends React.PureComponent<IProps> {
     } = this.props;
 
     return <div className='data-layers__item'>
-      <p className='data-layers__item__name'>{name}</p>
-      {/* <Label>{type}</Label> */}
+      <div className='data-layers__item__name'>
+        {name}
+      </div>
+      <div className='data-layers__item__type'>
+        {type}
+      </div>
       <Button
+        className='data-layers__item__button'
         bsStyle={
           disabled
             ? undefined
             : 'primary'
         }
-        onClick={this.handleClick}
-        title='Add this layer to map'
-      > Add
+        onClick={this.handleButtonClick}
+        title={
+          disabled
+            ? 'Unable to add this layer'
+            : 'Add this layer to map'
+        }
+        disabled={disabled}
+      >
+        {
+          disabled
+            ? 'Already present'
+            : 'Add to map'
+        }
       </Button>
     </div>;
   }

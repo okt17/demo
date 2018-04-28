@@ -7,8 +7,26 @@ interface IProps {
 }
 
 export default class LayersListItem extends React.Component<IProps> {
-  removeLayer = (): void => {
+  protected removeLayer = (): void => {
     this.props.map.removeLayer(this.props.layer);
+  };
+  protected handleOpacityChange = ( event: {
+    target: {
+      value: string;
+    };
+  } ) => {
+    const value = Number( event.target.value );
+
+    this.props.layer.setOpacity( value );
+
+    this.forceUpdate();
+  };
+  protected handleCheckboxClick = () => {
+    const layer = this.props.layer;
+
+    layer.setVisible( !layer.getVisible() );
+
+    this.forceUpdate();
   };
   render() {
     const
@@ -20,15 +38,35 @@ export default class LayersListItem extends React.Component<IProps> {
       name = layer.get( 'name' );
 
     return <div className='layers-list__item'>
+      <input
+        title='Visibility'
+        type='checkbox'
+        className='layers-list__item__checkbox'
+        checked={layer.getVisible()}
+        onChange={this.handleCheckboxClick}
+      />
+
       <div className='layers-list__item__name'>
         {name}
       </div>
+
+      <input
+        title='Opacity'
+        type='range'
+        min={0}
+        max={1.0}
+        step={0.05}
+        className='layers-list__item__opacity-input'
+        onChange={this.handleOpacityChange}
+        value={layer.getOpacity()}
+      />
+
       {
         layer.get( 'removable' ) !== false
         &&
         <ConfirmButton
           onClick={this.removeLayer}
-          modalText={`Are you sure you want to remove ${name}?`}
+          modalText={`Are you sure you want to remove ${name} layer?`}
         >
           Remove
         </ConfirmButton>

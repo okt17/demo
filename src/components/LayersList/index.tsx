@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ol from 'openlayers';
 import Item from './Item';
 
 interface IProps {
@@ -6,10 +7,12 @@ interface IProps {
 }
 
 export default class LayersList extends React.Component<IProps> {
-  constructor( props: IProps ) {
-    super( props );
-
-    this.props.map.getLayers().on( ['add', 'remove'], () => this.forceUpdate() );
+  private listenerKey: ol.EventsKey = this.props.map.getLayers().on(
+    ['add', 'remove'],
+    () => this.forceUpdate(),
+  );
+  componentWillUnmount () {
+    ol.Observable.unByKey( this.listenerKey );
   }
   render() {
     const
@@ -19,7 +22,7 @@ export default class LayersList extends React.Component<IProps> {
     return <div className='layers-list'>
       {
         layers.map( layer => <Item
-          key={layer.get('name')}
+          key={layer.get( 'name' )}
           layer={layer}
           map={map}
         /> )
