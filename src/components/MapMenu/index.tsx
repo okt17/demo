@@ -7,6 +7,7 @@ import MapPlaces from '../MapPlaces';
 
 interface IProps {
   map: ol.Map;
+  data?: any;
 }
 
 interface IState {
@@ -40,6 +41,10 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
     const {
       props: {
         map,
+        data: {
+          layers,
+          places,
+        }
       },
       state: {
         activeElementName,
@@ -87,13 +92,14 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
           {
             activeElementName === 'dataLayers'
             &&
-            <DataLayers map={map}/>
+            <DataLayers map={map} layers={layers}/>
           }
           {
             activeElementName === 'places'
             &&
             <MapPlaces
               map={map}
+              places={places}
               onAnimate={this.clearActiveElement}
             />
           }

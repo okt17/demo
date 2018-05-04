@@ -21,14 +21,16 @@ export default class EnhancedOlMap extends ol.Map {
     const oldView = this.getView();
     const oldProj = oldView.getProjection();
 
-    this.setView( new ol.View( {
-      center: ol.proj.transform(
-        oldView.getCenter(),
-        oldProj,
-        projection,
-      ),
-      zoom: oldView.getZoom(),
-    } ) );
+    this.setView(
+      new ol.View( {
+        center: ol.proj.transform(
+          oldView.getCenter(),
+          oldProj,
+          projection,
+        ),
+        zoom: oldView.getZoom(),
+      },
+    ) );
 
     this.dispatchEvent( {
       type: 'change:projection',
