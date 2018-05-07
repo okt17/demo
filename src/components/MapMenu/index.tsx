@@ -106,15 +106,25 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
           {
             activeElementName === 'about'
             &&
-            <p>
-              Powered by <a
-                href='http://openlayers.org/'
-                target='_blank'
-              >Openlayers</a> and <a
-                href='https://react-bootstrap.github.io/'
-                target='_blank'
-              >React-Bootstrap</a>.
-            </p>
+            <>
+              <p>
+                Powered by <a
+                  href='http://openlayers.org/'
+                  target='_blank'
+                >Openlayers</a> and <a
+                  href='https://react-bootstrap.github.io/'
+                  target='_blank'
+                >React-Bootstrap</a>.
+              </p>
+              <p>
+                <a
+                  href='https://github.com/okt17/demo'
+                  target='_blank'
+                >
+                  View source code
+                </a>
+              </p>
+            </>
           }
         </Modal>
       }
