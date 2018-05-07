@@ -17644,7 +17644,7 @@ var Map = /** @class */ (function (_super) {
             center: settings_1.default.DEFAULT_MAP_CENTER,
             zoom: settings_1.default.DEFAULT_MAP_ZOOM,
         });
-        // get all layers from data/layers
+        // get layers from data/layers
         var layers = layers_1.default.slice(0, 2).map(layers_2.getOlLayer);
         var vectorLayer = layers.find(function (layer) { return (layer instanceof ol.layer.Vector); });
         // initialize map controls

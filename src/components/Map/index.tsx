@@ -22,7 +22,7 @@ export default class Map extends React.Component<IProps> {
       zoom: SETTINGS.DEFAULT_MAP_ZOOM,
     } );
 
-    // get all layers from data/layers
+    // get layers from data/layers
     const layers = LAYERS.slice(0, 2).map( getOlLayer );
     const vectorLayer = layers.find( ( layer: ol.layer.Base ) => (
       layer instanceof ol.layer.Vector
