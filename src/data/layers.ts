@@ -7,9 +7,9 @@ import countries from './countries';
 
 const LAYERS: ILayer[] = [
   {
-    name: 'Stamen Terrain',
+    name: 'Stamen Watercolor',
     type: 'XYZ',
-    data_source: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
+    data_source: 'http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg',
   },
   {
     name: 'Countries of the world',
@@ -27,9 +27,9 @@ const LAYERS: ILayer[] = [
     data_source: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga',
   },
   {
-    name: 'Stamen Watercolor',
+    name: 'Stamen Terrain',
     type: 'XYZ',
-    data_source: 'http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg',
+    data_source: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
   },
   {
     name: 'Stamen Toner',

@@ -8810,9 +8810,9 @@ var countries_1 = __webpack_require__(359);
 // instead of using a database
 var LAYERS = [
     {
-        name: 'Stamen Terrain',
+        name: 'Stamen Watercolor',
         type: 'XYZ',
-        data_source: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
+        data_source: 'http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg',
     },
     {
         name: 'Countries of the world',
@@ -8830,9 +8830,9 @@ var LAYERS = [
         data_source: 'http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}&s=Ga',
     },
     {
-        name: 'Stamen Watercolor',
+        name: 'Stamen Terrain',
         type: 'XYZ',
-        data_source: 'http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg',
+        data_source: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg',
     },
     {
         name: 'Stamen Toner',
@@ -15626,13 +15626,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var ReactDOM = __webpack_require__(15);
 var react_redux_1 = __webpack_require__(330);
+var redux_1 = __webpack_require__(173);
 var store_1 = __webpack_require__(357);
 var App_1 = __webpack_require__(361);
+var appActions = __webpack_require__(524);
 __webpack_require__(519);
 function mapStateToProps(state) {
     return state;
 }
-var ConnectedApp = react_redux_1.connect(mapStateToProps)(App_1.default);
+function mapDispatchToProps(dispatch) {
+    return {
+        appActions: redux_1.bindActionCreators(appActions, dispatch),
+    };
+}
+var ConnectedApp = react_redux_1.connect(mapStateToProps, mapDispatchToProps)(App_1.default);
 ReactDOM.render(React.createElement(react_redux_1.Provider, { store: store_1.default },
     React.createElement(ConnectedApp, null)), document.getElementById('app-root'));
 
@@ -17495,6 +17502,14 @@ exports.default = store;
 
 "use strict";
 
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var layers_1 = __webpack_require__(178);
 var places_1 = __webpack_require__(360);
@@ -17504,9 +17519,15 @@ var initialState = {
         places: places_1.default,
     },
 };
-function appReducer(state) {
+function appReducer(state, _a) {
     if (state === void 0) { state = initialState; }
-    return state;
+    var type = _a.type, payload = _a.payload;
+    switch (type) {
+        case 'SET_MAP':
+            return __assign({}, state, { map: payload });
+        default:
+            return state;
+    }
 }
 exports.default = appReducer;
 
@@ -17568,49 +17589,19 @@ exports.default = PLACES;
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var Map_1 = __webpack_require__(362);
 var MapMenu_1 = __webpack_require__(364);
-var App = /** @class */ (function (_super) {
-    __extends(App, _super);
-    function App() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = {};
-        /*
-          we're using lambda properties instead of class methods
-          in order to preserve context
-          the other way around is to .bind( this ) every method in the constructor
-          the downside of this is that unlike traditional methods,
-          lambda properties won't be present on the prototype
-        */
-        _this.handleMapRef = function (olMap) { return _this.setState({
-            map: olMap,
-        }); };
-        return _this;
-    }
-    App.prototype.render = function () {
-        var _a = this, map = _a.state.map, data = _a.props.data;
-        console.log(this.props);
-        return React.createElement("div", { className: 'app' },
-            React.createElement(Map_1.default, { olMapRef: this.handleMapRef }),
-            map !== undefined
-                &&
-                    React.createElement(React.Fragment, null,
-                        React.createElement(MapMenu_1.default, { map: map, data: data })));
-    };
-    return App;
-}(React.PureComponent));
+var App = function (_a) {
+    var data = _a.data, map = _a.map, setMap = _a.appActions.setMap;
+    return React.createElement("div", { className: 'app' },
+        React.createElement(Map_1.default, { olMapRef: setMap }),
+        map !== undefined
+            &&
+                React.createElement(React.Fragment, null,
+                    React.createElement(MapMenu_1.default, { map: map, data: data })));
+};
 exports.default = App;
 
 
@@ -17684,12 +17675,13 @@ var Map = /** @class */ (function (_super) {
             // disable interaction on chaning layer visibility to false
             // and the other way around
             var changeEventListenerKey_1 = vectorLayer.on('change:visible', function () {
+                var isActive = interaction_1.getActive();
                 if (vectorLayer.getVisible()
                     &&
-                        interaction_1.getActive() == false) {
+                        isActive == false) {
                     interaction_1.setActive(true);
                 }
-                else if (interaction_1.getActive()) {
+                else if (isActive) {
                     interaction_1.setActive(false);
                 }
             });
@@ -17701,9 +17693,46 @@ var Map = /** @class */ (function (_super) {
                     ol.Observable.unByKey(changeEventListenerKey_1);
                 }
             });
+            // set specific style for this layer
+            var stroke_1 = new ol.style.Stroke({
+                color: '#158CBA',
+                width: 3,
+            });
+            // in case we have points as vector data
+            var circle_1 = new ol.style.Circle({
+                radius: 5,
+                stroke: stroke_1,
+            });
+            var textFill_1 = new ol.style.Fill({
+                color: '#FFFFFF',
+            });
+            // vector layer style function
+            vectorLayer.setStyle(function (feature) {
+                var properties = feature.getProperties();
+                // with no specific data model given,
+                // use any feature property that is a string
+                // as a text label
+                var label = Object.values(properties).find(function (value) { return typeof value === 'string'; });
+                var textStyle;
+                if (label !== undefined) {
+                    textStyle = new ol.style.Text({
+                        text: label,
+                        fill: textFill_1,
+                        stroke: stroke_1,
+                        scale: 1.5,
+                    });
+                }
+                return new ol.style.Style({
+                    stroke: stroke_1,
+                    image: circle_1,
+                    text: textStyle,
+                });
+            });
+            // make this layer to be always on top of other layers
+            vectorLayer.setZIndex(Number.MAX_SAFE_INTEGER);
         }
         if (typeof this.props.olMapRef === 'function') {
-            // passing the map object to upper component's state
+            // passing the map object as a reference
             // for use in other parts of the app
             this.props.olMapRef(map);
         }
@@ -17860,7 +17889,7 @@ var MapMenu = /** @class */ (function (_super) {
                                     ".")));
     };
     MapMenu.Items = {
-        layers: 'Manage Layers',
+        layers: 'Manage Map',
         dataLayers: 'Add Layers',
         places: 'Places',
         about: 'About',
@@ -29400,7 +29429,12 @@ var LayersList = /** @class */ (function (_super) {
     };
     LayersList.prototype.render = function () {
         var map = this.props.map, layers = map.getLayers().getArray();
-        return React.createElement("div", { className: 'layers-list' }, layers.map(function (layer) { return React.createElement(Item_1.default, { key: layer.get('name'), layer: layer, map: map }); }));
+        return React.createElement("div", { className: 'layers-list' },
+            React.createElement("h5", null, "Current layers:"),
+            layers.length === 0
+                &&
+                    React.createElement("p", null, "No layers found. Please add layers using the \"Add Layers\" button."),
+            layers.map(function (layer) { return React.createElement(Item_1.default, { key: layer.get('name'), layer: layer, map: map }); }));
     };
     return LayersList;
 }(React.Component));
@@ -29674,17 +29708,18 @@ var ol = __webpack_require__(46);
 var react_bootstrap_1 = __webpack_require__(53);
 var settings_1 = __webpack_require__(120);
 var PresetItem_1 = __webpack_require__(518);
+function getCurrentCenterInProjection(view, projection) {
+    var center = ol.proj.transform(view.getCenter(), view.getProjection(), projection);
+    return {
+        xValue: center[0].toFixed(5),
+        yValue: center[1].toFixed(5),
+    };
+}
 var MapPlaces = /** @class */ (function (_super) {
     __extends(MapPlaces, _super);
     function MapPlaces() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = __assign({}, (function () {
-            var view = _this.props.map.getView(), center = ol.proj.transform(view.getCenter(), view.getProjection(), _this.props.projection);
-            return {
-                xValue: center[0].toFixed(5),
-                yValue: center[1].toFixed(5),
-            };
-        })());
+        _this.state = __assign({}, getCurrentCenterInProjection(_this.props.map.getView(), _this.props.projection));
         _this.handleInputChange = function (_a) {
             var _b = _a.target, name = _b.name, value = _b.value;
             return _this.setState((_c = {},
@@ -30341,6 +30376,22 @@ module.exports = function (css) {
 	// send back the fixed css
 	return fixedCss;
 };
+
+
+/***/ }),
+/* 524 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+function setMap(map) {
+    return {
+        type: 'SET_MAP',
+        payload: map,
+    };
+}
+exports.setMap = setMap;
 
 
 /***/ })

@@ -8,8 +8,17 @@ const initialState: any = {
   },
 };
 
-function appReducer ( state: any = initialState ) {
-  return state;
+function appReducer ( state = initialState, { type, payload }: any ) {
+  switch ( type ) {
+    case 'SET_MAP':
+      return {
+        ...state,
+        map: payload,
+      };
+
+    default:
+      return state;
+  }
 }
 
 export default appReducer;

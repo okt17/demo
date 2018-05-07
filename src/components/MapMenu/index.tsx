@@ -20,7 +20,7 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
   static Items: {
     [key: string]: string;
   } = {
-    layers: 'Manage Layers',
+    layers: 'Manage Map',
     dataLayers: 'Add Layers',
     places: 'Places',
     about: 'About',

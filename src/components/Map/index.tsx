@@ -60,14 +60,15 @@ export default class Map extends React.Component<IProps> {
       // disable interaction on chaning layer visibility to false
       // and the other way around
       const changeEventListenerKey = vectorLayer.on( 'change:visible', () => {
+        const isActive = interaction.getActive();
         if (
           vectorLayer.getVisible()
           &&
-          interaction.getActive() == false
+          isActive == false
         ) {
           interaction.setActive( true );
         }
-        else if ( interaction.getActive() ) {
+        else if ( isActive ) {
           interaction.setActive( false );
         }
       } );
@@ -83,10 +84,58 @@ export default class Map extends React.Component<IProps> {
           }
         },
       );
+
+      // set specific style for this layer
+      const stroke = new ol.style.Stroke( {
+        color: '#158CBA', // blue-ish border color
+        width: 3,
+      } );
+
+      // in case we have points as vector data
+      const circle = new ol.style.Circle( {
+        radius: 5,
+        stroke,
+      } );
+
+      const textFill = new ol.style.Fill( {
+        color: '#FFFFFF',
+      } );
+
+      // vector layer style function
+      vectorLayer.setStyle( ( feature: ol.Feature ) => {
+        const properties = feature.getProperties();
+
+        // with no specific data model given,
+        // use any feature property that is a string
+        // as a text label
+        const label: string = Object.values( properties ).find(
+          ( value: any ) => typeof value === 'string',
+        );
+
+        let textStyle: ol.style.Text;
+        if ( label !== undefined ) {
+          textStyle = new ol.style.Text( {
+            text: label,
+            fill: textFill,
+            stroke,
+            scale: 1.5,
+          } );
+        }
+
+        return new ol.style.Style( {
+          stroke,
+          image: circle,
+          text: textStyle, // may be undefined and it's fine
+          // no fill style - completely transparent except for the borders
+        } );
+      } );
+
+      // make this layer to be always on top of other layers
+      vectorLayer.setZIndex( Number.MAX_SAFE_INTEGER );
     }
 
     if ( typeof this.props.olMapRef === 'function' ) {
-      // passing the map object to upper component's state
+      // passing the map object as a reference
       // for use in other parts of the app
       this.props.olMapRef( map );
     }

@@ -17,24 +17,30 @@ interface IState {
   yValue: string;
 }
 
+function getCurrentCenterInProjection (
+  view: ol.View,
+  projection: ol.ProjectionLike,
+): Pick<IState, 'xValue' | 'yValue'> {
+  const center = ol.proj.transform(
+    view.getCenter(),
+    view.getProjection(),
+    projection,
+  );
+
+  return {
+    xValue: center[0].toFixed( 5 ),
+    yValue: center[1].toFixed( 5 ),
+  };
+}
+
 class MapPlaces extends React.PureComponent<IProps, IState> {
   state: IState = {
     // initialize input coordinates with current map view center's coordinates
     // presented in this.props.projection's coordinate system
-    ...( () => {
-      const
-        view = this.props.map.getView(),
-        center = ol.proj.transform(
-          view.getCenter(),
-          view.getProjection(),
-          this.props.projection
-        );
-
-      return {
-        xValue: center[0].toFixed( 5 ),
-        yValue: center[1].toFixed( 5 ),
-      };
-    } )(),
+    ...getCurrentCenterInProjection(
+      this.props.map.getView(),
+      this.props.projection,
+    ),
   };
   static defaultProps: Partial<IProps> = {
     projection: 'EPSG:4326',

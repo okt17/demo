@@ -20,6 +20,14 @@ export default class LayersList extends React.Component<IProps> {
       layers = map.getLayers().getArray();
 
     return <div className='layers-list'>
+      <h5>Current layers:</h5>
+      {
+        layers.length === 0
+        &&
+        <p>
+          No layers found. Please add layers using the "Add Layers" button.
+        </p>
+      }
       {
         layers.map( layer => <Item
           key={layer.get( 'name' )}
