@@ -83,6 +83,7 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
               Close
             </Button>
           }
+          onBackgroundClick={this.clearActiveElement}
         >
           {
             activeElementName === 'layers'

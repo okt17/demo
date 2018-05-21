@@ -12946,20 +12946,48 @@ ToggleButton.propTypes = propTypes;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var react_bootstrap_1 = __webpack_require__(53);
 var Portal_1 = __webpack_require__(511);
-var Modal = function (_a) {
-    var title = _a.title, footerContent = _a.footerContent, children = _a.children;
-    return React.createElement(Portal_1.default, null,
-        React.createElement("div", { className: 'static-modal' },
-            React.createElement(react_bootstrap_1.Modal.Dialog, null,
-                React.createElement(react_bootstrap_1.Modal.Header, null,
-                    React.createElement(react_bootstrap_1.Modal.Title, null, title)),
-                React.createElement(react_bootstrap_1.Modal.Body, null, children),
-                React.createElement(react_bootstrap_1.Modal.Footer, null, footerContent))));
-};
+var Modal = /** @class */ (function (_super) {
+    __extends(Modal, _super);
+    function Modal() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.handleParentRef = function (instance) {
+            _this.dialogParentElement = instance;
+        };
+        _this.handleClick = function (event) {
+            if (_this.dialogParentElement === event.target.parentElement) {
+                _this.props.onBackgroundClick();
+            }
+        };
+        return _this;
+    }
+    Modal.prototype.render = function () {
+        var _a = this.props, title = _a.title, footerContent = _a.footerContent, children = _a.children, onBackgroundClick = _a.onBackgroundClick;
+        return React.createElement(Portal_1.default, null,
+            React.createElement("div", { className: 'static-modal', ref: this.handleParentRef },
+                React.createElement(react_bootstrap_1.Modal.Dialog, { onClick: typeof onBackgroundClick === 'function'
+                        ? this.handleClick
+                        : undefined },
+                    React.createElement(react_bootstrap_1.Modal.Header, null,
+                        React.createElement(react_bootstrap_1.Modal.Title, null, title)),
+                    React.createElement(react_bootstrap_1.Modal.Body, null, children),
+                    React.createElement(react_bootstrap_1.Modal.Footer, null, footerContent))));
+    };
+    return Modal;
+}(React.PureComponent));
 exports.default = Modal;
 
 
@@ -17869,7 +17897,7 @@ var MapMenu = /** @class */ (function (_super) {
             }),
             activeElementName !== undefined
                 &&
-                    React.createElement(Modal_1.default, { title: MapMenu.Items[activeElementName], footerContent: React.createElement(react_bootstrap_1.Button, { onClick: this.clearActiveElement }, "Close") },
+                    React.createElement(Modal_1.default, { title: MapMenu.Items[activeElementName], footerContent: React.createElement(react_bootstrap_1.Button, { onClick: this.clearActiveElement }, "Close"), onBackgroundClick: this.clearActiveElement },
                         activeElementName === 'layers'
                             &&
                                 React.createElement(LayersList_1.default, { map: map }),
