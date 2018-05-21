@@ -61,18 +61,15 @@ export default class LayersListItem extends React.Component<IProps> {
         value={layer.getOpacity()}
       />
 
-      {
-        layer.get( 'removable' ) !== false
-        &&
-        <ConfirmButton
-          title='Delete this layer from the map'
-          bsStyle='danger'
-          onClick={this.removeLayer}
-          modalText={`Are you sure you want to remove ${name} layer?`}
-        >
-          Remove
-        </ConfirmButton>
-      }
+      <ConfirmButton
+        disabled={layer.get( 'removable' ) === false}
+        title='Delete this layer from the map'
+        bsStyle='danger'
+        onClick={this.removeLayer}
+        modalText={`Are you sure you want to remove ${name} layer?`}
+      >
+        Remove
+      </ConfirmButton>
     </div>;
   }
 }

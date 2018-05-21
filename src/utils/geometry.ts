@@ -40,7 +40,7 @@ function getPolygonGeodesicArea (
     area = 0;
 
   geom4326.getLinearRings().forEach( ( lr: ol.geom.LinearRing ) => {
-    let lrArea = Math.abs( WGS84_SPHERE.geodesicArea( lr.getCoordinates() ) );
+    const lrArea = Math.abs( WGS84_SPHERE.geodesicArea( lr.getCoordinates() ) );
     if ( lrArea > maxLinearRingArea ) {
       area += maxLinearRingArea;
       maxLinearRingArea = lrArea;

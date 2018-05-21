@@ -8883,10 +8883,10 @@ function getFeatureFromPixel(map, pixel, vectorLayer) {
     var feature;
     if (vectorLayer.getVisible()) {
         map.forEachFeatureAtPixel(pixel, function (_feature) {
-            feature = _feature;
-            return feature;
+            feature = _feature; //getting the first feature found
+            return true; //stop forEachFeatureAtPixel cycle
         }, {
-            layerFilter: function (layer) { return layer === vectorLayer; }
+            layerFilter: function (layer) { return layer === vectorLayer; },
         });
     }
     return feature;
@@ -8949,15 +8949,17 @@ function setLayerStyle(layer) {
             });
         }
         return new ol.style.Style({
+            // no fill style - completely transparent except for the borders
             stroke: stroke,
             image: styles_1.DEFAULT_IMAGE,
             text: textStyle,
-            // no fill style - completely transparent except for the borders
+            // hovered feature overlaps selected feature
+            // selected feature overlaps other features
             zIndex: feature.get(HOVERED_PROPERTY_NAME)
-                ||
-                    feature.get(SELECTED_PROPERTY_NAME)
                 ? Number.MAX_SAFE_INTEGER
-                : undefined,
+                : feature.get(SELECTED_PROPERTY_NAME)
+                    ? Number.MAX_SAFE_INTEGER - 1
+                    : undefined,
         });
     });
 }
@@ -29581,9 +29583,7 @@ var LayersListItem = /** @class */ (function (_super) {
             React.createElement("input", { title: 'Visibility', type: 'checkbox', className: 'layers-list__item__checkbox', checked: layer.getVisible(), onChange: this.handleCheckboxClick }),
             React.createElement("div", { className: 'layers-list__item__name' }, name),
             React.createElement("input", { title: 'Opacity', type: 'range', min: 0, max: 1.0, step: 0.05, className: 'layers-list__item__opacity-input', onChange: this.handleOpacityChange, value: layer.getOpacity() }),
-            layer.get('removable') !== false
-                &&
-                    React.createElement(ConfirmButton_1.default, { title: 'Delete this layer from the map', bsStyle: 'danger', onClick: this.removeLayer, modalText: "Are you sure you want to remove " + name + " layer?" }, "Remove"));
+            React.createElement(ConfirmButton_1.default, { disabled: layer.get('removable') === false, title: 'Delete this layer from the map', bsStyle: 'danger', onClick: this.removeLayer, modalText: "Are you sure you want to remove " + name + " layer?" }, "Remove"));
     };
     return LayersListItem;
 }(React.Component));

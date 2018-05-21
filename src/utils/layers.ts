@@ -54,17 +54,18 @@ function getFeatureFromPixel (
   pixel: ol.Pixel,
   vectorLayer: ol.layer.Vector,
 ): ol.Feature | undefined {
-  let feature;
+  let feature: ol.Feature | undefined;
 
   if ( vectorLayer.getVisible() ) {
     map.forEachFeatureAtPixel(
       pixel,
       ( _feature: ol.Feature ) => {
-        feature = _feature;
-        return feature
+        feature = _feature; //getting the first feature found
+
+        return true; //stop forEachFeatureAtPixel cycle
       },
       {
-        layerFilter: ( layer: ol.layer.Base ) => layer === vectorLayer
+        layerFilter: ( layer: ol.layer.Base ) => layer === vectorLayer,
       }
     );
   }
@@ -146,14 +147,16 @@ export function setLayerStyle ( layer: ol.layer.Vector ) {
     }
 
     return new ol.style.Style( {
+      // no fill style - completely transparent except for the borders
       stroke,
       image: DEFAULT_IMAGE,
       text: textStyle, // may be undefined and it's fine
-      // no fill style - completely transparent except for the borders
+      // hovered feature overlaps selected feature
+      // selected feature overlaps other features
       zIndex: feature.get( HOVERED_PROPERTY_NAME )
-        || 
-        feature.get( SELECTED_PROPERTY_NAME )
-          ? Number.MAX_SAFE_INTEGER
+        ? Number.MAX_SAFE_INTEGER
+        : feature.get( SELECTED_PROPERTY_NAME )
+          ? Number.MAX_SAFE_INTEGER - 1
           : undefined,
     } );
   } );
