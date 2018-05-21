@@ -4,3 +4,10 @@ export function setMap ( map: ol.Map ) {
     payload: map,
   };
 }
+
+export function setSelectedFeature ( feature: ol.Feature ) {
+  return {
+    type: 'SET_FEATURE',
+    payload: feature,
+  };
+}

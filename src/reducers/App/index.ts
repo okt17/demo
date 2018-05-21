@@ -16,6 +16,12 @@ function appReducer ( state = initialState, { type, payload }: any ) {
         map: payload,
       };
 
+    case 'SET_FEATURE':
+      return {
+        ...state,
+        selectedFeature: payload,
+      };
+
     default:
       return state;
   }

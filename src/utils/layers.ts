@@ -1,4 +1,11 @@
 import * as ol from 'openlayers';
+import {
+  DEFAULT_STROKE,
+  DEFAULT_IMAGE,
+  DEFAULT_TEXT_FILL,
+  HOVERED_STROKE,
+  SELECTED_STROKE,
+} from '../utils/styles';
 
 export interface ILayer {
   name: string;
@@ -40,4 +47,112 @@ export function getOlLayer ( layer: ILayer ): ol.layer.Base {
   result.setProperties( layer );
 
   return result;
+}
+
+function getFeatureFromPixel (
+  map: ol.Map,
+  pixel: ol.Pixel,
+  vectorLayer: ol.layer.Vector,
+): ol.Feature | undefined {
+  let feature;
+
+  if ( vectorLayer.getVisible() ) {
+    map.forEachFeatureAtPixel(
+      pixel,
+      ( _feature: ol.Feature ) => {
+        feature = _feature;
+        return feature
+      },
+      {
+        layerFilter: ( layer: ol.layer.Base ) => layer === vectorLayer
+      }
+    );
+  }
+
+  return feature;
+}
+
+const HOVERED_PROPERTY_NAME = '__hovered';
+const SELECTED_PROPERTY_NAME = '__selected';
+
+export function addLayerInteraction (
+  layer: ol.layer.Vector,
+  map: ol.Map,
+  featureSelectCallback?: ( feature?: ol.Feature ) => void,
+): void {
+  let
+    hoveredFeature: ol.Feature | undefined,
+    selectedFeature: ol.Feature | undefined;
+
+  map.on( 'pointermove', ( event: any ) => {
+    const feature = getFeatureFromPixel( map, event.pixel, layer );
+
+    if ( hoveredFeature !== feature ) {
+      if ( hoveredFeature !== undefined ) {
+        hoveredFeature.set( HOVERED_PROPERTY_NAME, false );
+      }
+
+      const viewport = map.getViewport() as HTMLElement;
+      if ( feature !== undefined ) {
+        feature.set( HOVERED_PROPERTY_NAME, true );
+        viewport.style.cursor = 'pointer';
+      }
+      else {
+        viewport.style.cursor = '';
+      }
+      hoveredFeature = feature;
+    }
+  } );
+
+  if ( typeof featureSelectCallback === 'function' ) {
+    map.on( 'click', ( event : any ) => {
+      const feature = hoveredFeature;
+  
+      if ( selectedFeature !== feature ) {
+        if ( selectedFeature !== undefined ) {
+          selectedFeature.set( SELECTED_PROPERTY_NAME, false );
+        }
+        if ( feature !== undefined ) {
+          feature.set( SELECTED_PROPERTY_NAME, true );
+        }
+        selectedFeature = feature;
+  
+        featureSelectCallback( feature );
+      }
+    } );
+  }
+}
+
+export function setLayerStyle ( layer: ol.layer.Vector ) {
+  // vector layer style function
+  layer.setStyle( ( feature: ol.Feature ) => {
+    let stroke = feature.get( SELECTED_PROPERTY_NAME )
+      ? SELECTED_STROKE
+      : feature.get( HOVERED_PROPERTY_NAME )
+        ? HOVERED_STROKE
+        : DEFAULT_STROKE;
+
+    // text-label features using their ID's (country codes for countries)
+    const label = String( feature.getId() );
+
+    let textStyle: ol.style.Text;
+    if ( label !== undefined ) {
+      textStyle = new ol.style.Text( {
+        text: label,
+        fill: DEFAULT_TEXT_FILL,
+        stroke: stroke,
+        scale: 1.5,
+      } );
+    }
+
+    return new ol.style.Style( {
+      stroke,
+      image: DEFAULT_IMAGE,
+      text: textStyle, // may be undefined and it's fine
+      // no fill style - completely transparent except for the borders
+      zIndex: feature.get( HOVERED_PROPERTY_NAME )
+        ? 999
+        : undefined,
+    } );
+  } );
 }

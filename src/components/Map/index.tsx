@@ -3,10 +3,15 @@ import * as ol from 'openlayers';
 import EnhancedOlMap from '../../EnhancedOlMap';
 import SETTINGS from '../../settings';
 import LAYERS from '../../data/layers';
-import { getOlLayer } from '../../utils/layers';
+import {
+  getOlLayer,
+  addLayerInteraction,
+  setLayerStyle,
+} from '../../utils/layers';
 
 interface IProps {
   olMapRef? ( olMap: ol.Map ): void;
+  onFeatureSelect? ( feature?: ol.Feature ): void;
 }
 
 export default class Map extends React.Component<IProps> {
@@ -48,90 +53,19 @@ export default class Map extends React.Component<IProps> {
       controls,
     } );
 
+    // if there is a vector layer present
     if ( vectorLayer !== undefined ) {
-      // if there is a vector layer present,
       // add an interaction for it
-      const interaction = new ol.interaction.Modify( {
-        source: vectorLayer.getSource(),
-      } );
-
-      map.addInteraction( interaction );
-
-      // disable interaction on chaning layer visibility to false
-      // and the other way around
-      const changeEventListenerKey = vectorLayer.on( 'change:visible', () => {
-        const isActive = interaction.getActive();
-        if (
-          vectorLayer.getVisible()
-          &&
-          isActive == false
-        ) {
-          interaction.setActive( true );
-        }
-        else if ( isActive ) {
-          interaction.setActive( false );
-        }
-      } );
-
-      // remove this interaction if the vector layer is removed from the map
-      const removeEventListenerKey = map.getLayers().on(
-        'remove',
-        ( event: any ) => {
-          if ( event.element === vectorLayer ) {
-            map.removeInteraction( interaction );
-            ol.Observable.unByKey( removeEventListenerKey );
-            ol.Observable.unByKey( changeEventListenerKey );
-          }
-        },
-      );
+      addLayerInteraction( vectorLayer, map, this.props.onFeatureSelect );
 
       // set specific style for this layer
-      const stroke = new ol.style.Stroke( {
-        color: '#158CBA', // blue-ish border color
-        width: 3,
-      } );
-
-      // in case we have points as vector data
-      const circle = new ol.style.Circle( {
-        radius: 5,
-        stroke,
-      } );
-
-      const textFill = new ol.style.Fill( {
-        color: '#FFFFFF',
-      } );
-
-      // vector layer style function
-      vectorLayer.setStyle( ( feature: ol.Feature ) => {
-        const properties = feature.getProperties();
-
-        // with no specific data model given,
-        // use any feature property that is a string
-        // as a text label
-        const label: string = Object.values( properties ).find(
-          ( value: any ) => typeof value === 'string',
-        );
-
-        let textStyle: ol.style.Text;
-        if ( label !== undefined ) {
-          textStyle = new ol.style.Text( {
-            text: label,
-            fill: textFill,
-            stroke,
-            scale: 1.5,
-          } );
-        }
-
-        return new ol.style.Style( {
-          stroke,
-          image: circle,
-          text: textStyle, // may be undefined and it's fine
-          // no fill style - completely transparent except for the borders
-        } );
-      } );
+      setLayerStyle( vectorLayer );
 
       // make this layer to be always on top of other layers
       vectorLayer.setZIndex( Number.MAX_SAFE_INTEGER );
+
+      // make this layer non-removable
+      vectorLayer.set( 'removable', false );
     }
 
     if ( typeof this.props.olMapRef === 'function' ) {
