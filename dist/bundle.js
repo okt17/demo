@@ -29923,16 +29923,6 @@ exports.default = PresetItem;
 
 "use strict";
 
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = __webpack_require__(0);
 var react_bootstrap_1 = __webpack_require__(53);
@@ -29940,38 +29930,32 @@ var geometry_1 = __webpack_require__(521);
 function capitalize(str) {
     return str.slice(0, 1).toUpperCase() + str.slice(1).toLowerCase();
 }
-var FeatureView = /** @class */ (function (_super) {
-    __extends(FeatureView, _super);
-    function FeatureView() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    FeatureView.prototype.render = function () {
-        var feature = this.props.feature, area = geometry_1.getGeodesicArea(feature.getGeometry()), properties = Object.entries(feature.getProperties())
-            .filter(function (_a) {
-            var key = _a[0], value = _a[1];
-            return (key.startsWith('__') === false
-                &&
-                    typeof value !== 'object');
-        });
-        // not displaying system properties starting with '__'
-        // as well as object type properties (i.e. geometry)
-        return React.createElement("div", { className: 'feature-view' },
-            React.createElement(react_bootstrap_1.Table, null,
-                React.createElement("tr", null,
-                    React.createElement("td", null, "ID"),
-                    React.createElement("td", null, feature.getId())),
-                properties.map(function (_a) {
-                    var key = _a[0], value = _a[1];
-                    return React.createElement("tr", null,
-                        React.createElement("td", null, capitalize(key)),
-                        React.createElement("td", null, value));
-                }),
-                React.createElement("tr", null,
-                    React.createElement("td", null, "Calculated Geodesic Area"),
-                    React.createElement("td", null, geometry_1.formatArea(area)))));
-    };
-    return FeatureView;
-}(React.PureComponent));
+var FeatureView = function (_a) {
+    var feature = _a.feature;
+    var area = geometry_1.getGeodesicArea(feature.getGeometry()), properties = Object.entries(feature.getProperties())
+        .filter(function (_a) {
+        var key = _a[0], value = _a[1];
+        return (key.startsWith('__') === false
+            &&
+                typeof value !== 'object');
+    });
+    // not displaying system properties starting with '__'
+    // as well as object type properties (i.e. geometry)
+    return React.createElement("div", { className: 'feature-view' },
+        React.createElement(react_bootstrap_1.Table, null,
+            React.createElement("tr", null,
+                React.createElement("td", null, "ID"),
+                React.createElement("td", null, feature.getId())),
+            properties.map(function (_a) {
+                var key = _a[0], value = _a[1];
+                return React.createElement("tr", null,
+                    React.createElement("td", null, capitalize(key)),
+                    React.createElement("td", null, value));
+            }),
+            React.createElement("tr", null,
+                React.createElement("td", null, "Calculated Geodesic Area"),
+                React.createElement("td", null, geometry_1.formatArea(area)))));
+};
 exports.default = FeatureView;
 
 
