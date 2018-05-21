@@ -151,8 +151,10 @@ export function setLayerStyle ( layer: ol.layer.Vector ) {
       text: textStyle, // may be undefined and it's fine
       // no fill style - completely transparent except for the borders
       zIndex: feature.get( HOVERED_PROPERTY_NAME )
-        ? 999
-        : undefined,
+        || 
+        feature.get( SELECTED_PROPERTY_NAME )
+          ? Number.MAX_SAFE_INTEGER
+          : undefined,
     } );
   } );
 }

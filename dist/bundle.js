@@ -8954,7 +8954,9 @@ function setLayerStyle(layer) {
             text: textStyle,
             // no fill style - completely transparent except for the borders
             zIndex: feature.get(HOVERED_PROPERTY_NAME)
-                ? 999
+                ||
+                    feature.get(SELECTED_PROPERTY_NAME)
+                ? Number.MAX_SAFE_INTEGER
                 : undefined,
         });
     });
