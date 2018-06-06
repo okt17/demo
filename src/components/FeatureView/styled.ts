@@ -1,4 +1,6 @@
-.feature-view {
+import styled from 'styled-components';
+
+const FeatureView = styled.div`
   position: absolute;
   top: 5vh;
   left: 5vw;
@@ -15,4 +17,6 @@
       }
     }
   }
-}
+`;
+
+export default FeatureView;

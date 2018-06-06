@@ -2,6 +2,7 @@ import * as React from 'react';
 import Map from '../Map';
 import MapMenu from '../MapMenu';
 import FeatureView from '../FeatureView';
+import StyledApp from './styled';
 // import CoordinateInfo from '../CoordinateInfo';
 
 interface IProps {
@@ -22,7 +23,7 @@ const App: React.SFC<IProps> = ( {
     setMap,
     setSelectedFeature,
   },
-} ) => <div className='app'>
+} ) => <StyledApp>
   <Map
     olMapRef={setMap}
     onFeatureSelect={setSelectedFeature}
@@ -40,6 +41,6 @@ const App: React.SFC<IProps> = ( {
     &&
     <FeatureView feature={selectedFeature}/>
   }
-</div>;
+</StyledApp>;
 
 export default App;

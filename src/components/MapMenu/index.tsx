@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Button, ButtonToolbar, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'react-bootstrap';
 import Modal from '../../ui/Modal';
 import LayersList from '../LayersList';
 import DataLayers from '../DataLayers';
 import MapPlaces from '../MapPlaces';
+import StyledMapMenu from './styled';
 
 interface IProps {
   map: ol.Map;
@@ -51,10 +52,7 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
       },
     } = this;
 
-    return <ButtonGroup
-      className='map-menu'
-      bsSize='large'
-    >
+    return <StyledMapMenu>
       {
         Object.entries( MapMenu.Items ).map(
           ( [name, alias] ) => <Button
@@ -129,6 +127,6 @@ export default class MapMenu extends React.PureComponent<IProps, IState> {
           }
         </Modal>
       }
-    </ButtonGroup>;
+    </StyledMapMenu>;
   }
 }

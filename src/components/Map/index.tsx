@@ -15,10 +15,7 @@ interface IProps {
 }
 
 export default class Map extends React.Component<IProps> {
-  protected mapRootElement: HTMLElement;
-  protected handleRef = ( instance: HTMLElement ): void => {
-    this.mapRootElement = instance;
-  };
+  protected mapRootRef: React.RefObject<HTMLDivElement> = React.createRef();
   componentDidMount() {
     // initialize a view for the map based on default settings from settings.ts
     const view = new ol.View( {
@@ -47,7 +44,7 @@ export default class Map extends React.Component<IProps> {
 
     // initialize the map
     const map = new EnhancedOlMap( {
-      target: this.mapRootElement,
+      target: this.mapRootRef.current,
       view,
       layers,
       controls,
@@ -90,7 +87,7 @@ export default class Map extends React.Component<IProps> {
   render() {
     return <div
       className='ol-map-root'
-      ref={this.handleRef}
-    ></div>;
+      ref={this.mapRootRef}
+    />;
   }
 }

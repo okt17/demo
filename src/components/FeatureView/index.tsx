@@ -4,6 +4,7 @@ import {
   getGeodesicArea,
   formatArea,
 } from '../../utils/geometry';
+import StyledFeatureView from './styled';
 
 interface IProps {
   feature: ol.Feature;
@@ -25,7 +26,7 @@ const FeatureView: React.SFC<IProps> = ( { feature } ) => {
       // not displaying system properties starting with '__'
       // as well as object type properties (i.e. geometry)
 
-  return <div className='feature-view'>
+  return <StyledFeatureView>
     <Table>
       {
         <tr>
@@ -46,7 +47,7 @@ const FeatureView: React.SFC<IProps> = ( { feature } ) => {
         <td>{formatArea( area )}</td>
       </tr>
     </Table>
-  </div>;
+  </StyledFeatureView>;
 };
 
 export default FeatureView;

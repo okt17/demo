@@ -115,7 +115,7 @@ class MapPlaces extends React.PureComponent<IProps, IState> {
       projection = projection.getCode();
     }
 
-    return <div className='map-places'>
+    return <div>
       {
         places.map( ( preset: IPreset ) => <PresetItem
           key={preset.name}
